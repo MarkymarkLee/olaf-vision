@@ -1,0 +1,161 @@
+SYSTEM PROMPT
+
+You are a helpful assistant who is good at employing math and computer science tools to arrive at the solution. 
+You analyze numerical values carefully and think step by step. 
+You will also pay close attention to the human language correction, interpret the human intention, and use it to arrive at the solution.
+Please describe in detail how you apply your mathematical and computational abilities, to arrive at solutions.
+
+
+USER PROMPT
+
+You have a robot arm which is the Sawyer, a single robot arm with 7 degrees of freedom.
+The robot a parallel gripper equipped with two small finger pads, that comes shipped with the robot arm.
+The robot comes with a controller that takes in actions. 
+
+Due to the Metaworld environment restriction, its action space only supports 4 degrees of freedom.
+The expected action space of the controller is (dx, dy, dz, dgrip).
+The manual reads like the following: 
+( dx,  0,  0,     0)     <-- Translation in x-direction (left/right)         
+(  0, dy,  0,     0)     <-- Translation in y-direction (forward/backward) 
+(  0,  0, dz,     0)     <-- Translation in z-direction (up/down)
+(  0,  0,  0, dgrip)     <-- Normalized torque change for the gripper fingers
+
+The value of the dx, dy, dz, dgrip are all continuous between -1 and 1.
+Below is the list of values that will influence the robot behavior:
+
+| Action     | Value Change |
+| ---------- | ------------ |
+| left       | dx < 0       |
+| right      | dx > 0       |
+| forward    | dy > 0       |
+| backward   | dy < 0       |
+| up         | dz > 0       |
+| down       | dz < 0       |
+| grip close | dgrip > 0    |
+| grip open  | dgrip < 0    |
+
+
+This is a button pressing task. The robot will find the position of the button, and then press the button.
+The button will be placed along y-axis. The goal of the robot is to press the button as hard as it could.
+Each episode, the button positions are randomly decided.
+
+You are given the state information, which include:
+1. robot end effector 3D Cartesian position
+2. Normalized measurement of how open the robot gripper is
+3. First object (button) 3D position
+
+Your task is that, given a few choices of actions to perform at the current state, you will choose the correct action for the robot to perform.
+
+Note on the position:
+You should consider the position of the robot end effector and object, and how they are related to each other.
+For example, if the robot end effector is on the left of the object, you should consider moving the robot end effector to the right.
+
+Note on the gripper:
+The robot's gripper should be closed if it is beginning to grasp the object, or when it is holding the object. 
+When it is approaching the object, the gripper is open.
+If the robot gripper needs to be closed, you should continue to close the gripper, even if it is closed.
+Similarly, if the robot gripper needs to be open, you should continue to open the gripper, even if it is already open.
+
+
+Given the robot and object position, first explain what stage is the task currently in, and what is the relationship between the robot and object. Explain what a good action is supposed to do.
+Then based on your result, look at the given actions, and return which of the following actions is the correct action to take.
+
+Let's think step by step.
+Explaining your reasoning before arriving at the solution. 
+
+You always produce a single Action value in the end, which is a single number. You must follow this format!
+If there are multiple actions, you must only return one of them.
+
+    Input:
+    
+    Information relevant to robot:
+    Hand Position: [-0.01  0.68  0.13]
+    Gripper Value: 1.0
+    
+    Information relevant to first object (button):
+    Button Position: [0.01 0.7  0.12]
+    
+    
+    Action Choices:         
+    
+    Action 0: [0.2 0.  0.  0. ]
+    
+    Action 1: [0.  0.2 0.  0. ]
+    
+    Action 2: [0.  0.  0.2 0. ]
+    
+    Action 3: [0.  0.  0.  0.2]
+    
+    Action 4: [-0.2  0.   0.   0. ]
+    
+    Action 5: [ 0.  -0.2  0.   0. ]
+    
+    Action 6: [ 0.   0.  -0.2  0. ]
+    
+    Action 7: [ 0.   0.   0.  -0.2]
+    
+You also receive the following human language correction at the current state. Pay close attention to the human language correction,
+ interpret the human intention, and use it to arrive at the solution.
+
+Some pointers for human language correction interpretation:
+
+Move backward: decrease the y position
+Move forward: increase the y position
+Move left: decrease the x position
+Move right: increase the x position
+Move up: increase the z position
+Move down: decrease the z position
+Close the gripper: increase the grip value
+Open the gripper: decrease the grip value
+
+Human language correction:
+
+keep pressing the button
+
+RESPONSE
+To solve this problem, we need to analyze the current state of the robot and the button, and then choose the appropriate action based on the given choices and the human language correction.
+
+### Current State Analysis
+
+1. **Hand Position**: The robot's end effector is at \([-0.01, 0.68, 0.13]\).
+2. **Gripper Value**: The gripper is fully open with a value of \(1.0\).
+3. **Button Position**: The button is located at \([0.01, 0.7, 0.12]\).
+
+### Relationship Between Robot and Button
+
+- **X-axis**: The hand is slightly to the left of the button (\(-0.01\) vs \(0.01\)).
+- **Y-axis**: The hand is slightly behind the button (\(0.68\) vs \(0.7\)).
+- **Z-axis**: The hand is slightly above the button (\(0.13\) vs \(0.12\)).
+
+### Task Stage and Human Language Correction
+
+The task is to press the button as hard as possible. The human language correction "keep pressing the button" suggests that the robot should continue applying force on the button, which implies that the robot's end effector should be aligned with the button and the gripper should be closed to exert force.
+
+### Good Action Determination
+
+To press the button effectively:
+- The robot should move slightly forward in the y-direction to align with the button.
+- The robot should move slightly down in the z-direction to make contact with the button.
+- The gripper should be closed to apply force.
+
+### Action Choices Evaluation
+
+Given the action choices, we need to select the one that best aligns with the task of pressing the button:
+
+- **Action 0**: Move right (\(dx > 0\)).
+- **Action 1**: Move forward (\(dy > 0\)).
+- **Action 2**: Move up (\(dz > 0\)).
+- **Action 3**: Close the gripper (\(dgrip > 0\)).
+- **Action 4**: Move left (\(dx < 0\)).
+- **Action 5**: Move backward (\(dy < 0\)).
+- **Action 6**: Move down (\(dz < 0\)).
+- **Action 7**: Open the gripper (\(dgrip < 0\)).
+
+Since the human language correction emphasizes "keep pressing the button," the most relevant action is to close the gripper to apply force. Therefore, the correct action to take is:
+
+**Action 3: [0.  0.  0.  0.2]**
+
+This action increases the grip value, which corresponds to closing the gripper and applying force on the button.
+
+FINAL ACTION
+[0, 0, 0, 0.2]

@@ -1,0 +1,1 @@
+from diffusion.inference import DiffusionModel

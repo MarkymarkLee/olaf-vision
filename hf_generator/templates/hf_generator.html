@@ -1,0 +1,188 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Environment Stream</title>
+        <style>
+            body {
+                background-color: #f0f0f0;
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                width: 80%; /* Adjusted width */
+                max-width: 600px; /* Optional max-width */
+            }
+            .container > * {
+                width: 100%; /* Make child elements fill the container */
+            }
+            .controls {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+            }
+            .controls button {
+                margin: 20px 0px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .controls button:hover {
+                background-color: #0056b3;
+            }
+            #feedback-form {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                display: flex; /* Ensure flexbox is used */
+                justify-content: center; /* Center the button horizontally */
+                margin-top: 10px;
+            }
+            #feedback-text {
+                width: 80%;
+                height: 35px;
+                text-align: center;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            #feedback-form button {
+                margin-top: 10px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                background-color: #28a745;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                align-self: center; /* Center the button */
+            }
+            .hidden {
+                visibility: hidden;
+                height: 0;
+            }
+            #video-feed {
+                width: 75%;
+                height: auto;
+            }
+            .menu-link {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+            .menu-link button {
+                background-color: #6c757d;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="/" class="menu-link">
+            <button>Back to Menu</button>
+        </a>
+        <div class="container">
+            <p>
+                Click the "Start" button to start the video stream. <br />
+                Once the robot did something wrong, click the "Stop" button.
+                <br />
+                Enter your feedback to fix the robot or enter "good" if the
+                robot is perfect. <br />
+            </p>
+            <img id="video-feed" src="static/images/start.png" />
+            <div class="controls" id="controls">
+                <button onclick="startStream()" id="startButton">Start</button>
+                <button onclick="stopStream()" id="stopButton" class="hidden">
+                    Stop
+                </button>
+            </div>
+            <div id="feedback-form" class="hidden">
+                <textarea
+                    id="feedback-text"
+                    rows="4"
+                    cols="50"
+                    placeholder="Enter your feedback..."
+                ></textarea>
+                <button onclick="submitFeedback()">Submit Feedback</button>
+            </div>
+        </div>
+
+        <script>
+            function startStream() {
+                document.getElementById("video-feed").src = "/video_feed";
+                fetch("/start")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        document
+                            .getElementById("startButton")
+                            .classList.add("hidden");
+                        document
+                            .getElementById("stopButton")
+                            .classList.remove("hidden");
+                    });
+            }
+
+            function stopStream() {
+                fetch("/stop")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        document
+                            .getElementById("feedback-form")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("stopButton")
+                            .classList.add("hidden");
+                        document
+                            .getElementById("controls")
+                            .classList.add("hidden");
+                    });
+            }
+
+            function submitFeedback() {
+                const feedback = document.getElementById("feedback-text").value;
+                fetch("/feedback", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ feedback: feedback }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        document
+                            .getElementById("feedback-form")
+                            .classList.add("hidden");
+                        document.getElementById("feedback-text").value = "";
+                        document
+                            .getElementById("startButton")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("controls")
+                            .classList.remove("hidden");
+                        document.getElementById("video-feed").src =
+                            "static/images/start.png";
+                    });
+            }
+        </script>
+    </body>
+</html>

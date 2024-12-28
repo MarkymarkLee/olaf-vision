@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+    <style>
+    </style>
+</head>
+<body>
+    <!-- Add Back to Menu button -->
+    
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-title">Trajectory Video</div>
+            <div class="video-container">
+                <video controls> 
+                    <source src="{{ '/' + data['video'] }}" type="video/mp4"/> 
+                </video> 
+            </div>
+            <div class="panel-title">Human Feedback</div>
+            <div class="feedback-text">
+                {{ data['feedback'] | safe }}
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Olaf Analysis -->
+            <div class="analysis-panel">
+                <div class="panel-title">Olaf</div>
+                <div class="scrollable-section">
+                    <div class="query-text">
+                        {{ data['olaf'] | safe }}
+                    </div>
+                    
+                </div>
+                <div class="final-action">
+                    Final Action: {{ data['olaf_action'] }}
+                </div>
+            </div>
+
+            <!-- Olafvision Analysis -->
+            <div class="analysis-panel">
+                <div class="panel-title">Olafvision</div>
+                <div class="scrollable-section">
+                    <div class="response-text">
+                        {{ data['vlm'] | safe }}
+                    </div>
+                    <div class="vision-content">
+                        <div class="main-image">
+                            <img src="{{ '/' + data['traj_image'] }}" alt="Main Scene Image" />
+                        </div>
+                        <div class="image-grid">
+                            {% for image in data['next_state_images'] %}
+                            <div class="small-image">
+                                <img src="{{ '/' + image }}" alt="Analysis Image {{ loop.index }}" />
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="final-action">
+                    Chosen Image: Image {{ data['chosen_image'] + 1 }}<br>
+                    Final Action: {{ data['vlm_action']}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="/">
+        <button class="floating-button menu-button">Back to Menu</button>
+    </a>
+    <!-- Floating Buttons -->
+    <a href="{{ '/compare/' + data['task'] + '/' + data['prev_index']}}">
+        <button class="floating-button left-button">Prev</button>
+    </a>
+    <a href="{{ '/compare/' + data['task'] + '/' + data['next_index']}}">
+        <button class="floating-button right-button">Next</button>
+    </a>
+</body>
+</html>
