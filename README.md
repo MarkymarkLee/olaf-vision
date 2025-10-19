@@ -2,7 +2,7 @@
 
 This is the codebase for the project Olaf Vision. The project aims to improve the performance of imitation learning models by leveraging human feedback data.
 
-[Link to our paper](https://drive.google)
+[Link to our paper](https://github.com/MarkymarkLee/olaf-vision/blob/main/report.pdf)
 
 [Link to our presentation](https://docs.google.com/presentation/d/1Is2y5TNdOjudLpDG65aTcfut5XUKBFXZ4WjHuHnMHRU/edit?usp=sharing)
 
